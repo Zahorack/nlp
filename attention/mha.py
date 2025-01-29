@@ -9,7 +9,8 @@ class ScaledDotProductAttention(nn.Module):
     Scaled Dot-Product Attention.
     https://arxiv.org/pdf/1706.03762.pdf
     """
-    def forward(self, query, key, value, mask=None):
+
+    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, mask=None):
         dk = query.size()[-1]
         scores = query.matmul(key.transpose(-2, -1)) / math.sqrt(dk)
         if mask is not None:
@@ -20,7 +21,9 @@ class ScaledDotProductAttention(nn.Module):
 
 class MultiHeadAttention(nn.Module):
 
-    def __init__(self, in_features, head_num, bias=True, activation=F.relu):
+    def __init__(
+        self, in_features: int, head_num: int, bias: bool = True, activation: callable = F.relu
+    ):
         """
         Multi-head Attention layer.
         https://arxiv.org/pdf/1706.03762.pdf
@@ -46,7 +49,9 @@ class MultiHeadAttention(nn.Module):
         self.linear_v = nn.Linear(in_features, in_features, bias)
         self.linear_o = nn.Linear(in_features, in_features, bias)
 
-    def forward(self, q, k, v, mask=None):
+    def forward(
+        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
         q, k, v = self.linear_q(q), self.linear_k(k), self.linear_v(v)
         if self.activation is not None:
             q = self.activation(q)
@@ -66,7 +71,7 @@ class MultiHeadAttention(nn.Module):
             y = self.activation(y)
         return y
 
-    def _reshape_to_batches(self, x):
+    def _reshape_to_batches(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, seq_len, in_feature = x.size()
         sub_dim = in_feature // self.head_num
         return (
@@ -75,7 +80,7 @@ class MultiHeadAttention(nn.Module):
             .reshape(batch_size * self.head_num, seq_len, sub_dim)
         )
 
-    def _reshape_from_batches(self, x):
+    def _reshape_from_batches(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, seq_len, in_feature = x.size()
         batch_size //= self.head_num
         out_dim = in_feature * self.head_num
