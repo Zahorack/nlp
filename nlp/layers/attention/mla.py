@@ -1,7 +1,8 @@
 import math
+
 import torch
 from torch import nn
-from torch.nn import RMSNorm, Linear
+from torch.nn import Linear, RMSNorm
 
 
 class MultiHeadLatentAttention(nn.Module):

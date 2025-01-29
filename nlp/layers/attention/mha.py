@@ -1,4 +1,6 @@
 import math
+from typing import Callable
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -22,7 +24,7 @@ class ScaledDotProductAttention(nn.Module):
 class MultiHeadAttention(nn.Module):
 
     def __init__(
-        self, in_features: int, head_num: int, bias: bool = True, activation: callable = F.relu
+        self, in_features: int, head_num: int, bias: bool = True, activation: Callable = F.relu
     ):
         """
         Multi-head Attention layer.
