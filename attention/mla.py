@@ -1,6 +1,4 @@
 import math
-from typing import Optional
-
 import torch
 from torch import nn
 from torch.nn import RMSNorm, Linear
@@ -100,10 +98,14 @@ class MultiHeadLatentAttention(nn.Module):
         return y.to(dtype)
 
     def forward(
-        self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor]
+        self,
+        x: torch.Tensor,
+        start_pos: int,
+        freqs_cis: torch.Tensor,
+        mask: torch.Tensor | None = None,
     ):
         """
-        Forward pass for the Multi-Headed Attention Layer (MLA).
+        Forward pass for the Multi-Headed Latent Attention Layer
 
         :param x: Input tensor of shape (batch_size, seq_len, dim).
         :param start_pos: Starting position in the sequence for caching.
