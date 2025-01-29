@@ -8,7 +8,7 @@ from nlp.config import settings
 
 
 def load_model_and_tokenizer(
-    model_path: str, device: Union[str, torch.device], cache_dir: str
+        model_path: str, device: Union[str, torch.device], cache_dir: str
 ) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
     """
     Load a pre-trained causal language model and its tokenizer.
@@ -21,14 +21,14 @@ def load_model_and_tokenizer(
 
 
 def contrastive_generation(
-    amateur_model: AutoModelForCausalLM,
-    expert_model: AutoModelForCausalLM,
-    tokenizer: AutoTokenizer,
-    prompt: str,
-    max_tokens: int = 500,
-    alpha: float = 0.1,
-    temperature: float = 1.0,
-    device: Union[str, torch.device] = "cuda",
+        amateur_model: AutoModelForCausalLM,
+        expert_model: AutoModelForCausalLM,
+        tokenizer: AutoTokenizer,
+        prompt: str,
+        max_tokens: int = 500,
+        alpha: float = 0.1,
+        temperature: float = 1.0,
+        device: Union[str, torch.device] = "cuda",
 ) -> str:
     """
     Generate text using contrastive decoding between an amateur and an expert model.
@@ -40,10 +40,10 @@ def contrastive_generation(
     for _ in tqdm(range(max_tokens), desc="Generating text"):
         with torch.no_grad():
             amateur_logits: Tensor = (
-                amateur_model(generated_tokens).logits[:, -1, :].to(device) / temperature
+                    amateur_model(generated_tokens).logits[:, -1, :].to(device) / temperature
             )
             expert_logits: Tensor = (
-                expert_model(generated_tokens).logits[:, -1, :].to(device) / temperature
+                    expert_model(generated_tokens).logits[:, -1, :].to(device) / temperature
             )
 
             contrastive_logits: Tensor = expert_logits - alpha * amateur_logits
@@ -56,28 +56,29 @@ def contrastive_generation(
     return tokenizer.decode(generated_tokens[0], skip_special_tokens=True)
 
 
-user_message = """Give a very very brief docstring for the following function:\n```\nfunction updateEloScores(
-	scores,
-	results,
-	kFactor = 4,
+user_message = """Give a very very brief docstring for the following function:\n```
+function updateEloScores(
+    scores,
+    results,
+    kFactor = 4,
 ) {
-	for (const result of results) {
-		const { first, second, outcome } = result;
-		const firstScore = scores[first] ?? 1000;
-		const secondScore = scores[second] ?? 1000;
+    for (const result of results) {
+            const { first, second, outcome } = result;
+            const firstScore = scores[first] ?? 1000;
+            const secondScore = scores[second] ?? 1000;
 
-		const expectedScoreFirst = 1 / (1 + Math.pow(10, (secondScore - firstScore) / 400));
-		const expectedScoreSecond = 1 / (1 + Math.pow(10, (firstScore - secondScore) / 400));
-		let sa = 0.5;
-		if (outcome === 1) {
-			sa = 1;
-		} else if (outcome === -1) {
-			sa = 0;
-		}
-		scores[first] = firstScore + kFactor * (sa - expectedScoreFirst);
-		scores[second] = secondScore + kFactor * (1 - sa - expectedScoreSecond);
-	}
-	return scores;
+            const expectedScoreFirst = 1 / (1 + Math.pow(10, (secondScore - firstScore) / 400));
+            const expectedScoreSecond = 1 / (1 + Math.pow(10, (firstScore - secondScore) / 400));
+            let sa = 0.5;
+            if (outcome === 1) {
+                    sa = 1;
+            } else if (outcome === -1) {
+                    sa = 0;
+            }
+            scores[first] = firstScore + kFactor * (sa - expectedScoreFirst);
+            scores[second] = secondScore + kFactor * (1 - sa - expectedScoreSecond);
+    }
+    return scores;
 }\n```"""
 
 
@@ -88,7 +89,9 @@ def main() -> None:
 
     # Load models and tokenizers
     expert_model, _ = load_model_and_tokenizer(expert_path, device, settings.HUGGINGFACE_CACHE_DIR)
-    amateur_model, amateur_tokenizer = load_model_and_tokenizer(amateur_path, device, settings.HUGGINGFACE_CACHE_DIR)
+    amateur_model, amateur_tokenizer = load_model_and_tokenizer(
+        amateur_path, device, settings.HUGGINGFACE_CACHE_DIR
+    )
 
     # Prepare prompt
     prompt: str = amateur_tokenizer.apply_chat_template(
@@ -108,7 +111,6 @@ def main() -> None:
         device=device,
     )
     print(response)
-
 
 
 if __name__ == "__main__":
