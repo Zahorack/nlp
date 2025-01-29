@@ -8,7 +8,7 @@ from nlp.config import settings
 
 
 def load_model_and_tokenizer(
-        model_path: str, device: Union[str, torch.device], cache_dir: str
+    model_path: str, device: Union[str, torch.device], cache_dir: str
 ) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
     """
     Load a pre-trained causal language model and its tokenizer.
@@ -21,14 +21,14 @@ def load_model_and_tokenizer(
 
 
 def contrastive_generation(
-        amateur_model: AutoModelForCausalLM,
-        expert_model: AutoModelForCausalLM,
-        tokenizer: AutoTokenizer,
-        prompt: str,
-        max_tokens: int = 500,
-        alpha: float = 0.1,
-        temperature: float = 1.0,
-        device: Union[str, torch.device] = "cuda",
+    amateur_model: AutoModelForCausalLM,
+    expert_model: AutoModelForCausalLM,
+    tokenizer: AutoTokenizer,
+    prompt: str,
+    max_tokens: int = 500,
+    alpha: float = 0.1,
+    temperature: float = 1.0,
+    device: Union[str, torch.device] = "cuda",
 ) -> str:
     """
     Generate text using contrastive decoding between an amateur and an expert model.
@@ -40,10 +40,10 @@ def contrastive_generation(
     for _ in tqdm(range(max_tokens), desc="Generating text"):
         with torch.no_grad():
             amateur_logits: Tensor = (
-                    amateur_model(generated_tokens).logits[:, -1, :].to(device) / temperature
+                amateur_model(generated_tokens).logits[:, -1, :].to(device) / temperature
             )
             expert_logits: Tensor = (
-                    expert_model(generated_tokens).logits[:, -1, :].to(device) / temperature
+                expert_model(generated_tokens).logits[:, -1, :].to(device) / temperature
             )
 
             contrastive_logits: Tensor = expert_logits - alpha * amateur_logits
